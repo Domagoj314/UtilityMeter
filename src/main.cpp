@@ -2,6 +2,7 @@
 #include "esp_camera.h"
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include "../secrets.h"
 
 #define PWDN_GPIO_NUM -1
 #define RESET_GPIO_NUM -1
@@ -62,7 +63,7 @@ void setup()
 {
   delay(3000);
   Serial.begin(115200);
-  WiFi.begin("add wifi name", "add wifi password");
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   while (WiFi.status() != WL_CONNECTED)
   {
 
