@@ -45,7 +45,7 @@ void initCamera()
   config.xclk_freq_hz = 20000000;
   config.pixel_format = PIXFORMAT_JPEG;
   config.frame_size = FRAMESIZE_SVGA;
-  config.jpeg_quality = 4;
+  config.jpeg_quality = 0;
   config.fb_count = 1;
   config.fb_location = CAMERA_FB_IN_PSRAM;
 
@@ -78,7 +78,7 @@ void setup()
   Serial.println(fb->len);
 
   HTTPClient http;
-  http.begin("http://192.168.1.189:5000/ocr");
+  http.begin(SERVER_URL);
   http.addHeader("Content-type", "image/jpeg");
   int status = http.POST(fb->buf, fb->len);
   Serial.println(status);
