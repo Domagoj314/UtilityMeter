@@ -45,7 +45,7 @@ void initCamera()
   config.xclk_freq_hz = 20000000;
   config.pixel_format = PIXFORMAT_JPEG;
   config.frame_size = FRAMESIZE_SVGA;
-  config.jpeg_quality = 0;
+  config.jpeg_quality = 3;
   config.fb_count = 1;
   config.fb_location = CAMERA_FB_IN_PSRAM;
 
@@ -61,12 +61,13 @@ void initCamera()
 
 void setup()
 {
+  pinMode(0, INPUT_PULLUP);
+
   delay(3000);
   Serial.begin(115200);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   while (WiFi.status() != WL_CONNECTED)
   {
-
     Serial.println("Spajam..");
     delay(1000);
   }
@@ -74,21 +75,36 @@ void setup()
   IPAddress ip = WiFi.localIP();
   Serial.println(ip);
   initCamera();
-  camera_fb_t *fb = esp_camera_fb_get();
-  Serial.println(fb->len);
 
-  HTTPClient http;
-  http.begin(SERVER_URL);
-  http.addHeader("Content-type", "image/jpeg");
-  int status = http.POST(fb->buf, fb->len);
-  Serial.println(status);
-  http.end();
-  esp_camera_fb_return(fb);
 }
+
+//int prethodnoStanje = HIGH;
+unsigned long zadnjiPritisak = 0;
 
 void loop()
 {
-
-
+  //int stanje = digitalRead(0);
+  if(millis() - zadnjiPritisak > 500){
+    //if(prethodnoStanje == HIGH && stanje == LOW){}
+      if(Serial.available()){
+        char p = Serial.read();
+        if(p == 'p'){
+          camera_fb_t *fb = esp_camera_fb_get();
+          esp_camera_fb_return(fb);
+          fb = esp_camera_fb_get();
+          Serial.println(fb->len);
+          HTTPClient http;
+          http.begin(SERVER_URL);
+          http.addHeader("Content-type", "image/jpeg");
+          int status = http.POST(fb->buf, fb->len);
+          Serial.println(status);
+          http.end();
+          esp_camera_fb_return(fb);
+          zadnjiPritisak = millis();
+        }
+      }
+    }
+  //prethodnoStanje = stanje;
 }
+
 
