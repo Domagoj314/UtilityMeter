@@ -14,10 +14,15 @@ def ocr():
     jpg = request.data
     arr = np.frombuffer(jpg, dtype=np.uint8)
     img = cv2.imdecode(arr, cv2.IMREAD_COLOR)
-    cv2.imwrite("picture.png", img)
-    print("Picture saved!")
-    image = Image.open("picture.png")
-    text = tess.image_to_string(image)
+    
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    inverted = cv2.bitwise_not(gray)
+    inverted = cv2.resize(inverted, (0,0), fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
+    _, inverted = cv2.threshold(inverted, 127, 255, cv2.THRESH_BINARY)
+    cv2.imwrite("picture.png", inverted)
+
+
+    text = tess.image_to_string(inverted, config='--psm 6 --oem 3 -c tessedit_char_whitelist=0123456789.')
     print(text)
     return text, 200
 

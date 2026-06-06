@@ -61,7 +61,6 @@ void initCamera()
 
 void setup()
 {
-  pinMode(0, INPUT_PULLUP);
 
   delay(3000);
   Serial.begin(115200);
@@ -78,14 +77,11 @@ void setup()
 
 }
 
-//int prethodnoStanje = HIGH;
 unsigned long zadnjiPritisak = 0;
 
 void loop()
 {
-  //int stanje = digitalRead(0);
   if(millis() - zadnjiPritisak > 500){
-    //if(prethodnoStanje == HIGH && stanje == LOW){}
       if(Serial.available()){
         char p = Serial.read();
         if(p == 'p'){
@@ -104,7 +100,6 @@ void loop()
         }
       }
     }
-  //prethodnoStanje = stanje;
 }
 
 
