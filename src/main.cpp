@@ -81,10 +81,7 @@ unsigned long zadnjiPritisak = 0;
 
 void loop()
 {
-  if(millis() - zadnjiPritisak > 500){
-      if(Serial.available()){
-        char p = Serial.read();
-        if(p == 'p'){
+          
           camera_fb_t *fb = esp_camera_fb_get();
           esp_camera_fb_return(fb);
           fb = esp_camera_fb_get();
@@ -92,14 +89,12 @@ void loop()
           HTTPClient http;
           http.begin(SERVER_URL);
           http.addHeader("Content-type", "image/jpeg");
+          http.addHeader("X-API-Key", API_KEY);
           int status = http.POST(fb->buf, fb->len);
           Serial.println(status);
           http.end();
           esp_camera_fb_return(fb);
-          zadnjiPritisak = millis();
-        }
-      }
-    }
+          delay(10000);
 }
 
 
