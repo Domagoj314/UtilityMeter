@@ -10,10 +10,15 @@ CREATE TABLE IF NOT EXISTS measurements (
 )
 """
 
+altertable_addtype = """
+ALTER TABLE measurements ADD COLUMN type TEXT
+"""
+
 try:
     with sqlite3.connect(database) as conn:
         cursor = conn.cursor()
         cursor.execute(create_table)
+        cursor.execute(altertable_addtype)
         conn.commit()
 
 except sqlite3.Error as e:
