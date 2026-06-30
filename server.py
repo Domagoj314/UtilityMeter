@@ -8,10 +8,15 @@ from secrets import apikey
 import sqlite3
 from datetime import datetime
 from flask import jsonify
+from flask_cors import CORS
+
+
 
 tess.pytesseract.tesseract_cmd = PATH_TO_TESSERACT_EXECUTABLE
 
 app = Flask(__name__)
+
+CORS(app)
 
 @app.route('/ocr', methods=['POST'])
 def ocr():
