@@ -68,7 +68,7 @@ def get_measurements():
         if requested_type:
             cursor.execute("SELECT id, reading, datetime, image_path, type FROM measurements WHERE type = ? ORDER BY datetime DESC", (requested_type,))
         else:
-            cursor.execute("SELECT id, reading, datetime, image_path, type FROM measurements")
+            cursor.execute("SELECT id, reading, datetime, image_path, type FROM measurements ORDER BY datetime DESC")
         rows = cursor.fetchall()
         measurements = []
         for row in rows:
