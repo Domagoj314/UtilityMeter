@@ -73,7 +73,10 @@ class MyHomePageState extends State<MyHomePage> {
                     MaterialPageRoute(
                       builder: (context) => MjerenjePage(type: 'struja'),
                     ),
-                  ).then((value) => getType());
+                  ).then((value) {
+                      getType();
+                      fetchData();
+                  } );
                 },
                 child: Text('Struja'),
               ),
@@ -84,7 +87,10 @@ class MyHomePageState extends State<MyHomePage> {
                     MaterialPageRoute(
                       builder: (context) => MjerenjePage(type: 'voda'),
                     ),
-                  ).then((value) => getType());
+                  ).then((value) {
+                      getType();
+                      fetchData();
+                  } );
                 },
                 child: Text('Voda'),
               ),
@@ -95,7 +101,10 @@ class MyHomePageState extends State<MyHomePage> {
                     MaterialPageRoute(
                       builder: (context) => MjerenjePage(type: 'plin'),
                     ),
-                  ).then((value) => getType());
+                  ).then((value) {
+                      getType();
+                      fetchData();
+                  } );
                 },
                 child: Text('Plin'),
               ),
