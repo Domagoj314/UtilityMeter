@@ -64,7 +64,11 @@ def get_measurements():
     try:
         conn = sqlite3.connect("measurements.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT id, reading, datetime, image_path, type FROM measurements")
+        requested_type = request.args.get('type')
+        if requested_type:
+            cursor.execute("SELECT id, reading, datetime, image_path, type FROM measurements WHERE type = ? ORDER BY datetime DESC", (requested_type,))
+        else:
+            cursor.execute("SELECT id, reading, datetime, image_path, type FROM measurements")
         rows = cursor.fetchall()
         measurements = []
         for row in rows:
