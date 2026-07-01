@@ -131,6 +131,17 @@ class MjerenjePageState extends State<MjerenjePage> {
     }
   }
 
+  Future<void> setType(String type) async {
+    final response = await http.post(
+      Uri.parse('https://utilitymeter.uk/set-type'),
+      headers: {
+        'X-API-Key': 'zavrsnirad',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({'type': type})
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -141,15 +152,27 @@ class MjerenjePageState extends State<MjerenjePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('${widget.type.toUpperCase()} MEASUREMENTS')),
-      body: ListView.builder(
-        itemCount: measurements.length,
-        itemBuilder: (context, index) {
-          final measurement = measurements[index];
-          return ListTile(
-            title: Text(measurement['reading'].toString()),
-            subtitle: Text(measurement['datetime'].toString()),
-          );
-        },
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: measurements.length,
+              itemBuilder: (context, index) {
+                final measurement = measurements[index];
+                return ListTile(
+                  title: Text(measurement['reading'].toString()),
+                  subtitle: Text(measurement['datetime'].toString()),
+                );
+              },
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              setType(widget.type);
+            },
+            child: Text('Postavi tip mjerenja na ${widget.type}'),
+          ),
+        ],
       ),
     );
   }
