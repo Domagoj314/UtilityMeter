@@ -101,6 +101,15 @@ def set_type():
     save_current_type(current_type)
     return "Type set successfully", 200
 
+#get za dohvat trenutnog tipa mjerenja
+@app.route('/get-type', methods=['GET'])
+def get_type():
+    api_key = request.headers.get('X-API-Key')
+    if api_key != apikey:
+        return "Unauthorized", 401
+    current_type = get_current_type()
+    return jsonify({"type": current_type}), 200
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

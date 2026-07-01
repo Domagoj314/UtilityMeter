@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+
 void main() {
   runApp(MyApp());
 }
@@ -21,6 +22,7 @@ class MyHomePage extends StatefulWidget {
 
 class MyHomePageState extends State<MyHomePage> {
   List<dynamic> measurements = [];
+  String? gottenType;
 
   Future<void> fetchData() async {
     final response = await http.get(
@@ -34,16 +36,32 @@ class MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  Future<void> getType() async{
+    final response = await http.get(
+      Uri.parse('https://utilitymeter.uk/get-type'),
+      headers: {'X-API-Key': 'zavrsnirad'},
+    );
+    if (response.statusCode == 200) {
+      final gottenType = jsonDecode(response.body)['type'];
+      setState(() {
+        this.gottenType = gottenType;
+      });
+    }
+  }
+
+
+
   @override
   void initState() {
     super.initState();
     fetchData();
+    getType();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Utility Meter')),
+      appBar: AppBar(title: Text('Utility Meter - currently measuring: ${gottenType ?? 'loading...'}')),
       body: Column(
         children: [
           Row(
