@@ -47,7 +47,7 @@ def ocr():
     try:
         conn = sqlite3.connect("measurements.db")
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO measurements (reading, image_path, type) VALUES (?, ?, ?)", (34, f"pictures/{filename}", current_type))
+        cursor.execute("INSERT INTO measurements (reading, image_path, type) VALUES (?, ?, ?)", (12, f"pictures/{filename}", current_type))
         conn.commit()
     except sqlite3.Error as e:
         print(f"An error occurred while adding data to the table: {e}")
