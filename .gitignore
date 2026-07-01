@@ -7,3 +7,4 @@ secrets.h
 secrets.py
 measurements.db
 pictures
+current_type.txt
