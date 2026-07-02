@@ -320,6 +320,7 @@ class MyHomePageState extends State<MyHomePage> {
                   ),
                 ],
               ),
+                                          SizedBox(height: 30), 
               Text(
                 'Zadnjih 7 dana potrošnje za: ${gottenType}',
                 style: TextStyle(
@@ -328,7 +329,12 @@ class MyHomePageState extends State<MyHomePage> {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              SizedBox(height: 24),
+                            SizedBox(height: 30),            
+SizedBox(
+  width: double.infinity,
+  child: Text('Reading', textAlign: TextAlign.left),
+),
+            SizedBox(height: 20),
               SizedBox(
                 height: 200,
                 child: Padding(
@@ -441,6 +447,12 @@ class MyHomePageState extends State<MyHomePage> {
                         ),
                 ),
               ),
+                            SizedBox(height: 30),            
+SizedBox(
+  width: double.infinity,
+  child: Text('Date', textAlign: TextAlign.right),
+),
+            SizedBox(height: 60),
               SizedBox(height: 24),
               Text(
                 'Zadnja očitanja:',
@@ -523,6 +535,7 @@ class MjerenjePageState extends State<MjerenjePage> {
   List<dynamic> measurements = [];
   double? monthlyConsumption;
   double? lastReading;
+  List<dynamic> monthlyMeasurements = [];
 
   Future<void> fetchData() async {
     final response = await http.get(
@@ -552,13 +565,14 @@ class MjerenjePageState extends State<MjerenjePage> {
     if (response.statusCode == 200) {
       setState(() {
         measurements = jsonDecode(response.body);
-      });
-    }
-    List<dynamic> monthlyMeasurements = measurements.where((measurement) {
+              monthlyMeasurements = measurements.where((measurement) {
       DateTime measurementDate = DateTime.parse(measurement['datetime']);
       return measurementDate.month == DateTime.now().month &&
           measurementDate.year == DateTime.now().year;
     }).toList();
+      });
+    }
+
     if (monthlyMeasurements.isEmpty) return;
     if(monthlyMeasurements.length < 2) {
       setState(() {
@@ -568,8 +582,8 @@ class MjerenjePageState extends State<MjerenjePage> {
     }
     setState(() {
       monthlyConsumption =
-          monthlyMeasurements.last['reading'] -
-          monthlyMeasurements.first['reading'];
+          monthlyMeasurements.first['reading'] -
+          monthlyMeasurements.last['reading'];
     });
     print(monthlyMeasurements);
   }
@@ -600,18 +614,11 @@ class MjerenjePageState extends State<MjerenjePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('${widget.type.toUpperCase()} MEASUREMENTS')),
-      body: Padding(
+      body: SingleChildScrollView(
+        child: Padding(
         padding: EdgeInsets.all(16),
         child: Column(
           children: [
-            Text(
-              'Potrošnja ovog mjeseca: ${monthlyConsumption != null ? monthlyConsumption!.toStringAsFixed(2) : 'nedovoljno podataka'}',
-              style: TextStyle(
-                color: Color(0xFFF8F3EA),
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
             Container(
                       width: 300,
                       padding: EdgeInsets.all(12),
@@ -649,7 +656,139 @@ class MjerenjePageState extends State<MjerenjePage> {
                         ],
                       ),
                     ),
-            SizedBox(height: 8),
+                                                              SizedBox(height: 30), 
+              Text(
+                'Zadnjih 30 dana potrošnje za: ${widget.type}',
+                style: TextStyle(
+                  color: Color(0xFFF8F3EA),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              SizedBox(height: 30),            
+SizedBox(
+  width: double.infinity,
+  child: Text('Reading', textAlign: TextAlign.left),
+),
+            SizedBox(height: 20),
+                     SizedBox(
+                height: 200,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8),
+                  child: monthlyMeasurements.isEmpty
+                      ? Center(child: Text('Nema podataka za zadnjih 7 dana'))
+                      : LineChart(
+                          LineChartData(
+                            clipData: FlClipData.all(),
+                            minY:
+                                monthlyMeasurements
+                                    .map((m) => m['reading'].toDouble())
+                                    .reduce((a, b) => a < b ? a : b) -
+                                2,
+                            maxY:
+                                monthlyMeasurements
+                                    .map((m) => m['reading'].toDouble())
+                                    .reduce((a, b) => a > b ? a : b) +
+                                2,
+                            lineBarsData: [
+                              LineChartBarData(
+                                spots: monthlyMeasurements.reversed.map((m) {
+                                  return FlSpot(
+                                    DateTime.parse(
+                                      m['datetime'],
+                                    ).millisecondsSinceEpoch.toDouble(),
+                                    m['reading'].toDouble(),
+                                  );
+                                }).toList(),
+                                color: Color(0xFFFA9EBC),
+                                isCurved: true,
+                                dotData: FlDotData(
+                                  show: true,
+                                  getDotPainter: (spot, percent, bar, index) {
+                                    return FlDotCirclePainter(
+                                      radius: 4,
+                                      color: Color(0xFFFA9EBC),
+                                      strokeColor: Color(0xFFF8F3EA),
+                                      strokeWidth: 1,
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                            gridData: FlGridData(show: false),
+                            borderData: FlBorderData(show: false),
+                            titlesData: FlTitlesData(
+                              leftTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  reservedSize: 45,
+                                  getTitlesWidget: (value, meta) {
+                                    return Text(
+                                      value.toStringAsFixed(1),
+                                      style: TextStyle(
+                                        color: Color(0xFFFFDBD1),
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              bottomTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  reservedSize: 35,
+                                  getTitlesWidget: (value, meta) {
+                                    final date =
+                                        DateTime.fromMillisecondsSinceEpoch(
+                                          value.toInt(),
+                                        );
+                                    return Padding(
+                                      padding: EdgeInsets.only(top: 4),
+                                      child: Text(
+                                        '${date.day}.${date.month}\n${date.hour}:${date.minute.toString().padLeft(2, '0')}',
+                                        style: TextStyle(
+                                          color: Color(0xFFFFDBD1),
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    );
+                                  },
+                                  interval: monthlyMeasurements.length > 1
+                                      ? (DateTime.parse(
+                                                          monthlyMeasurements
+                                                              .first['datetime'],
+                                                        ).millisecondsSinceEpoch
+                                                        .toDouble() -
+                                                    DateTime.parse(
+                                                          monthlyMeasurements
+                                                              .last['datetime'],
+                                                        ).millisecondsSinceEpoch
+                                                        .toDouble())
+                                                .abs() /
+                                            (monthlyMeasurements.length - 1)
+                                      : null,
+                                ),
+                              ),
+                              rightTitles: AxisTitles(
+                                sideTitles: SideTitles(showTitles: false),
+                              ),
+                              topTitles: AxisTitles(
+                                sideTitles: SideTitles(showTitles: false),
+                              ),
+                            ),
+                          ),
+                        ),
+                ),
+              ),
+              SizedBox(height: 30),            
+SizedBox(
+  width: double.infinity,
+  child: Text('Date', textAlign: TextAlign.right),
+),
+            SizedBox(height: 60),
            SizedBox(
   height: 300,
   child: ListView.builder(
@@ -689,6 +828,7 @@ class MjerenjePageState extends State<MjerenjePage> {
           ],
         ),
       ),
+    ),
     );
   }
 }
