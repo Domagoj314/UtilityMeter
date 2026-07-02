@@ -451,41 +451,44 @@ class MyHomePageState extends State<MyHomePage> {
                 ),
               ),
               SizedBox(height: 8),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: measurements.length,
-                itemBuilder: (context, index) {
-                  final measurement = measurements[index];
-                  return Card(
-                    color: Color(0xFF1A2E7A),
-                    margin: EdgeInsets.symmetric(vertical: 4),
-                    child: Padding(
-                      padding: EdgeInsets.all(12),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            measurement['reading'].toString(),
-                            style: TextStyle(
-                              color: Color(0xFFFA9EBC),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          Text(
-                            measurement['datetime'].toString(),
-                            style: TextStyle(
-                              color: Color(0xFFFFDBD1),
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
+              SizedBox(
+  height: 300,
+  child: ListView.builder(
+    itemCount: measurements.length,
+    itemBuilder: (context, index) {
+      final measurement = measurements[index];
+      return Card(
+        color: Color(0xFF1A2E7A),
+        margin: EdgeInsets.symmetric(vertical: 4),
+        child: Padding(
+          padding: EdgeInsets.all(12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                measurement['reading'].toString(),
+                style: TextStyle(color: Color(0xFFFA9EBC), fontSize: 16, fontWeight: FontWeight.w500),
               ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    measurement['type'].toString(),
+                    style: TextStyle(color: Color(0xFFF8F3EA), fontSize: 20),
+                  ),
+                  Text(
+                    measurement['datetime'].toString(),
+                    style: TextStyle(color: Color(0xFFFFDBD1), fontSize: 12),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  ),
+),
               SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
@@ -519,6 +522,7 @@ class MjerenjePage extends StatefulWidget {
 class MjerenjePageState extends State<MjerenjePage> {
   List<dynamic> measurements = [];
   double? monthlyConsumption;
+  double? lastReading;
 
   Future<void> fetchData() async {
     final response = await http.get(
@@ -570,11 +574,26 @@ class MjerenjePageState extends State<MjerenjePage> {
     print(monthlyMeasurements);
   }
 
+    Future<void> fetchLastReading(String type) async {
+    final response = await http.get(
+      Uri.parse('https://utilitymeter.uk/measurements?type=$type&limit=1'),
+      headers: {'X-API-Key': 'zavrsnirad'},
+    );
+    if (response.statusCode == 200) {
+      setState(() {
+        final data = jsonDecode(response.body);
+        lastReading = data[0]['reading'].toDouble();
+      });
+    }
+  }
+
+
   @override
   void initState() {
     super.initState();
     fetchData();
     calculateMonthlyConsumptionForType(widget.type);
+    fetchLastReading(widget.type);
   }
 
   @override
@@ -593,20 +612,74 @@ class MjerenjePageState extends State<MjerenjePage> {
                 fontWeight: FontWeight.w500,
               ),
             ),
+            Container(
+                      width: 300,
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Color(0xFFFA9EBC), width: 1),
+                        color: Color(0xFF1A2E7A),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        children: [
+                          Icon(Icons.air, color: Color(0xFFFA9EBC)),
+                          Text(
+                            widget.type,
+                            style: TextStyle(
+                              color: Color(0xFFF8F3EA),
+                              fontSize: 20,
+                            ),
+                          ),
+                          Text(
+                            'Last reading: ${lastReading != null ? lastReading!.toStringAsFixed(2) : '-'}',
+                            style: TextStyle(
+                              color: Color(0xFFFA9EBC),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                           Text(
+                            'Monthly consumption:${monthlyConsumption != null ? monthlyConsumption!.toStringAsFixed(2) : 'Not enough data'}',
+                            style: TextStyle(
+                              color: Color(0xFFFA9EBC),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
             SizedBox(height: 8),
-            Expanded(
-              child: ListView.builder(
-                itemCount: measurements.length,
-                itemBuilder: (context, index) {
-                  final measurement = measurements[index];
-                  return ListTile(
-                    title: Text(measurement['reading'].toString()),
-                    subtitle: Text(measurement['datetime'].toString()),
-                  );
-                },
+           SizedBox(
+  height: 300,
+  child: ListView.builder(
+    itemCount: measurements.length,
+    itemBuilder: (context, index) {
+      final measurement = measurements[index];
+      return Card(
+        color: Color(0xFF1A2E7A),
+        margin: EdgeInsets.symmetric(vertical: 4),
+        child: Padding(
+          padding: EdgeInsets.all(12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                measurement['reading'].toString(),
+                style: TextStyle(color: Color(0xFFFA9EBC), fontSize: 16, fontWeight: FontWeight.w500),
               ),
-            ),
-
+              Text(
+                measurement['datetime'].toString(),
+                style: TextStyle(color: Color(0xFFFFDBD1), fontSize: 12),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  ),
+),
+              SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
                 setType(widget.type);
