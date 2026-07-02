@@ -126,8 +126,6 @@ class MyHomePageState extends State<MyHomePage> {
             return measurementDate.isAfter(sevenback) &&
                 measurementDate.isBefore(today);
           }).toList();
-          print('last7days: ${last7daysMeasurements.length}');
-          print('first measurement: ${last7daysMeasurements[0]}');
         }
       });
     }
@@ -282,6 +280,7 @@ Widget build(BuildContext context) {
                 ),
               ],
             ),
+            Text('Zadnjih 7 dana potrošnje za: ${gottenType}', style: TextStyle(color: Color(0xFFF8F3EA), fontSize: 16, fontWeight: FontWeight.w500)),
             SizedBox(height: 24),
             SizedBox(
               height: 200,
