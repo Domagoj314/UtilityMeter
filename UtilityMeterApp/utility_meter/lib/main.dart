@@ -585,7 +585,6 @@ class MjerenjePageState extends State<MjerenjePage> {
           monthlyMeasurements.first['reading'] -
           monthlyMeasurements.last['reading'];
     });
-    print(monthlyMeasurements);
   }
 
     Future<void> fetchLastReading(String type) async {
