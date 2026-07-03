@@ -10,6 +10,8 @@ from datetime import datetime
 from flask import jsonify
 from flask_cors import CORS
 import os
+import re
+
 
 tess.pytesseract.tesseract_cmd = PATH_TO_TESSERACT_EXECUTABLE
 
@@ -40,14 +42,31 @@ def ocr():
     jpg = request.data
     arr = np.frombuffer(jpg, dtype=np.uint8)
     img = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+
+    img = cv2.rotate(img, cv2.ROTATE_180)
+    img = cv2.flip(img, 1)
+
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    inverted = cv2.bitwise_not(gray)
+    _, thresh = cv2.threshold(inverted, 127, 255, cv2.THRESH_BINARY)
+
+
+    text = tess.image_to_string(thresh, config='--psm 6 --oem 3 -c tessedit_char_whitelist=0123456789.')
+    text = text.strip()
+
+    numbers = re.findall(r'\d+\.?\d*', text)
+    print(f"OCR: {text}")
+    reading = float(numbers[0]) if numbers else 0.0
+
+
     filename = datetime.now().strftime("%Y%m%d_%H%M%S") + ".png"
-    cv2.imwrite(f"pictures/{filename}", img)
+    cv2.imwrite(f"pictures/{filename}", thresh)
     current_type = get_current_type()
     print("Slika spremljena!")
     try:
         conn = sqlite3.connect("measurements.db")
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO measurements (reading, image_path, type) VALUES (?, ?, ?)", (12, f"pictures/{filename}", current_type))
+        cursor.execute("INSERT INTO measurements (reading, image_path, type) VALUES (?, ?, ?)", (reading, f"pictures/{filename}", current_type))
         conn.commit()
     except sqlite3.Error as e:
         print(f"An error occurred while adding data to the table: {e}")
