@@ -5,13 +5,13 @@ import 'dart:convert';
 import 'package:fl_chart/fl_chart.dart';
 import 'postavke_page.dart';
 
-
 class MyHomePage extends StatefulWidget {
   @override
   State<MyHomePage> createState() => MyHomePageState();
 }
 
 class MyHomePageState extends State<MyHomePage> {
+  
   List<dynamic> measurements = [];
   String? gottenType;
   double? lastStruja;
@@ -129,17 +129,26 @@ class MyHomePageState extends State<MyHomePage> {
               'Mjeri: ${gottenType ?? 'loading...'}',
               style: TextStyle(fontSize: 14, color: Color(0xFFFFDBD1)),
             ),
-
           ],
         ),
-          actions: [
-    IconButton(
-      icon: Icon(Icons.settings, color: Color(0xFFFA9EBC)),
-      onPressed: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => PostavkePage()));
-      },
-    ),
-  ],
+        actions: [
+          IconButton(
+            icon: Icon(Icons.settings, color: Color(0xFFFA9EBC)),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PostavkePage()),
+              ).then((value) {
+                getType();
+                fetchData();
+                fetchLastReadingForStruja();
+                fetchLastReadingForVoda();
+                fetchLastReadingForPlin();
+                getLast7DaysForType();
+              });
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -290,7 +299,7 @@ class MyHomePageState extends State<MyHomePage> {
                   ),
                 ],
               ),
-                                          SizedBox(height: 30), 
+              SizedBox(height: 30),
               Text(
                 'Zadnjih 7 dana potrošnje za: ${gottenType}',
                 style: TextStyle(
@@ -299,12 +308,12 @@ class MyHomePageState extends State<MyHomePage> {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-                            SizedBox(height: 30),            
-SizedBox(
-  width: double.infinity,
-  child: Text('Reading', textAlign: TextAlign.left),
-),
-            SizedBox(height: 20),
+              SizedBox(height: 30),
+              SizedBox(
+                width: double.infinity,
+                child: Text('Reading', textAlign: TextAlign.left),
+              ),
+              SizedBox(height: 20),
               SizedBox(
                 height: 200,
                 child: Padding(
@@ -417,12 +426,12 @@ SizedBox(
                         ),
                 ),
               ),
-                            SizedBox(height: 30),            
-SizedBox(
-  width: double.infinity,
-  child: Text('Date', textAlign: TextAlign.right),
-),
-            SizedBox(height: 60),
+              SizedBox(height: 30),
+              SizedBox(
+                width: double.infinity,
+                child: Text('Date', textAlign: TextAlign.right),
+              ),
+              SizedBox(height: 60),
               SizedBox(height: 24),
               Text(
                 'Zadnja očitanja:',
@@ -434,43 +443,53 @@ SizedBox(
               ),
               SizedBox(height: 8),
               SizedBox(
-  height: 300,
-  child: ListView.builder(
-    itemCount: measurements.length,
-    itemBuilder: (context, index) {
-      final measurement = measurements[index];
-      return Card(
-        color: Color(0xFF1A2E7A),
-        margin: EdgeInsets.symmetric(vertical: 4),
-        child: Padding(
-          padding: EdgeInsets.all(12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                measurement['reading'].toString(),
-                style: TextStyle(color: Color(0xFFFA9EBC), fontSize: 16, fontWeight: FontWeight.w500),
+                height: 300,
+                child: ListView.builder(
+                  itemCount: measurements.length,
+                  itemBuilder: (context, index) {
+                    final measurement = measurements[index];
+                    return Card(
+                      color: Color(0xFF1A2E7A),
+                      margin: EdgeInsets.symmetric(vertical: 4),
+                      child: Padding(
+                        padding: EdgeInsets.all(12),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              measurement['reading'].toString(),
+                              style: TextStyle(
+                                color: Color(0xFFFA9EBC),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  measurement['type'].toString(),
+                                  style: TextStyle(
+                                    color: Color(0xFFF8F3EA),
+                                    fontSize: 20,
+                                  ),
+                                ),
+                                Text(
+                                  measurement['datetime'].toString(),
+                                  style: TextStyle(
+                                    color: Color(0xFFFFDBD1),
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    measurement['type'].toString(),
-                    style: TextStyle(color: Color(0xFFF8F3EA), fontSize: 20),
-                  ),
-                  Text(
-                    measurement['datetime'].toString(),
-                    style: TextStyle(color: Color(0xFFFFDBD1), fontSize: 12),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      );
-    },
-  ),
-),
               SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
