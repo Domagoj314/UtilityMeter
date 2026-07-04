@@ -153,9 +153,9 @@ def get_interval():
     if api_key != apikey:
         return "Unauthorized", 401
     current_interval = get_current_interval()
-    return jsonify({"interval": int(current_interval)}), 200
+    return str(int(current_interval)), 200
 
-
+    
 #post za postavljanje intervala mjerenja
 @app.route('/set-interval', methods=['POST'])
 def set_interval():
