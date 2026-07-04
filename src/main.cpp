@@ -78,8 +78,9 @@ void setup()
 }
 
 unsigned long zadnjiPritisak = 0;
+unsigned long interval = 1;
 
-void loop()
+void loop() 
 {
           
           camera_fb_t *fb = esp_camera_fb_get();
@@ -94,7 +95,20 @@ void loop()
           Serial.println(status);
           http.end();
           esp_camera_fb_return(fb);
-          delay(10000);
+
+          HTTPClient httpGetInterval;
+          httpGetInterval.begin(SERVER_URL_INTERVAL);
+          httpGetInterval.addHeader("X-API-Key", API_KEY);
+          int statusInterval = httpGetInterval.GET();
+          if (statusInterval == 200){
+
+            String response = httpGetInterval.getString();
+            Serial.println("Interval: " + response);
+            interval = response.toInt();
+          
+          }
+
+          delay(interval * 60000);
 }
 
 
