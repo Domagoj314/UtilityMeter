@@ -33,6 +33,21 @@ def save_current_type(current_type):
 
 current_type = get_current_type()
 
+
+def get_current_interval():
+    if os.path.exists("current_interval.txt"):
+        with open("current_interval.txt", "r") as f:
+            return f.read().strip()
+    else:
+        return "30"
+
+def save_current_interval(current_interval):
+    with open("current_interval.txt", "w") as f:
+        f.write(current_interval)
+
+current_interval = get_current_interval()
+
+
 #post za novo mjerenje
 @app.route('/ocr', methods=['POST'])
 def ocr():
@@ -128,6 +143,32 @@ def get_type():
         return "Unauthorized", 401
     current_type = get_current_type()
     return jsonify({"type": current_type}), 200
+
+
+
+#get za dohvat trenutnog intervala mjerenja
+@app.route('/get-interval', methods=['GET'])
+def get_interval():
+    api_key = request.headers.get('X-API-Key')
+    if api_key != apikey:
+        return "Unauthorized", 401
+    current_interval = get_current_interval()
+    return jsonify({"interval": int(current_interval)}), 200
+
+
+#post za postavljanje intervala mjerenja
+@app.route('/set-interval', methods=['POST'])
+def set_interval():
+    api_key = request.headers.get('X-API-Key')
+    if api_key != apikey:
+        return "Unauthorized", 401
+
+    data = request.get_json()
+    if 'interval' not in data:
+        return "Bad Request: 'interval' field is required", 400
+    current_interval = str(data['interval'])
+    save_current_interval(current_interval)
+    return "Interval set successfully", 200
 
 
 if __name__ == '__main__':
