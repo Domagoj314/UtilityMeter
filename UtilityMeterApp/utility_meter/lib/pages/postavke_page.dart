@@ -29,9 +29,9 @@ class PostavkePageState extends State<PostavkePage> {
       headers: {'X-API-Key': 'zavrsnirad'},
     );
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
+      final data = response.body;
       setState(() {
-        interval = data['interval'].toDouble();
+        interval = double.parse(data);
       });
     }
   }
