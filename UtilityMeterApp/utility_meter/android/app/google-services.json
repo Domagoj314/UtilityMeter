@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "213980855279",
+    "project_id": "utilitymeter-3feed",
+    "storage_bucket": "utilitymeter-3feed.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:213980855279:android:86418101c3459855f4141a",
+        "android_client_info": {
+          "package_name": "com.example.utility_meter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjRvuY1GGsr9MnFvtgleR46FBuHZwj3uE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
