@@ -8,17 +8,17 @@ class PostavkePage extends StatefulWidget {
 }
 
 class PostavkePageState extends State<PostavkePage> {
-  double interval = 30;
+  int interval = 30;
   bool novaSlika = true;
   bool neobicnaPotrosnja = true;
   bool uredajOffline = true;
 
 
-  Future<void> spremiInterval(double interval) async {
+  Future<void> spremiInterval(int interval) async {
     final response = await http.post(
       Uri.parse('https://utilitymeter.uk/set-interval'),
       headers: {'X-API-Key': 'zavrsnirad', 'Content-Type': 'application/json'},
-      body: jsonEncode({'interval': interval}),
+      body: jsonEncode({'interval': interval.round()}),
     );
   }
 
@@ -31,7 +31,7 @@ class PostavkePageState extends State<PostavkePage> {
     if (response.statusCode == 200) {
       final data = response.body;
       setState(() {
-        interval = double.parse(data);
+        interval = int.parse(data);
       });
     }
   }
@@ -65,14 +65,14 @@ class PostavkePageState extends State<PostavkePage> {
               children: [
                 Text('Interval slikanja:', style: TextStyle(fontSize: 16)),
                 Slider(
-                  value: interval,
+                  value: interval.toDouble(),
                   min: 5,
                   max: 180,
                   divisions: 35,
-                  label: interval.round().toString(),
+                  label: interval.toString(),
                   onChanged: (double value) {
                     setState(() {
-                      interval = value;
+                      interval = value.round();
                     });
                   },
                 ),

@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:fl_chart/fl_chart.dart';
 import 'postavke_page.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -19,6 +20,21 @@ class MyHomePageState extends State<MyHomePage> {
   double? lastPlin;
   List<dynamic> last7daysMeasurements = [];
   double? monthlyConsumption;
+  String? fcmToken;
+
+//za firebase obavijesti
+Future<void> getFCMToken() async {
+
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  await messaging.requestPermission();
+  String? token = await messaging.getToken();
+  setState(() {
+    fcmToken = token;
+  });
+  print('FCM Token: $token');
+
+}
+
 
   Future<void> fetchData() async {
     final response = await http.get(
@@ -109,6 +125,7 @@ class MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    getFCMToken();
     fetchData();
     getType();
     fetchLastReadingForStruja();
