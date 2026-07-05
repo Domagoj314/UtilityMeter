@@ -11,18 +11,29 @@ class PostavkePageState extends State<PostavkePage> {
   int interval = 30;
   bool novaSlika = true;
   bool neobicnaPotrosnja = true;
-  bool uredajOffline = true;
 
 
-  Future<void> spremiInterval(int interval) async {
+  Future<void> spremiObavijesti(int interval, bool novaSlika, bool neobicnaPotrosnja) async {
     final response = await http.post(
       Uri.parse('https://utilitymeter.uk/set-interval'),
       headers: {'X-API-Key': 'zavrsnirad', 'Content-Type': 'application/json'},
       body: jsonEncode({'interval': interval.round()}),
     );
+        final responsen = await http.post(
+      Uri.parse('https://utilitymeter.uk/set-newpic-status'),
+      headers: {'X-API-Key': 'zavrsnirad', 'Content-Type': 'application/json'},
+      body: jsonEncode({'newpic': novaSlika}),
+    );
+            final responsew = await http.post(
+      Uri.parse('https://utilitymeter.uk/set-reading-status'),
+      headers: {'X-API-Key': 'zavrsnirad', 'Content-Type': 'application/json'},
+      body: jsonEncode({'weirdReading': neobicnaPotrosnja}),
+    );
   }
 
-  Future<void> getInterval() async{
+
+
+  Future<void> getObavijesti() async{
 
     final response = await http.get(
       Uri.parse('https://utilitymeter.uk/get-interval'),
@@ -34,13 +45,34 @@ class PostavkePageState extends State<PostavkePage> {
         interval = int.parse(data);
       });
     }
+
+       final responsen = await http.get(
+      Uri.parse('https://utilitymeter.uk/get-newpic-status'),
+      headers: {'X-API-Key': 'zavrsnirad'},
+    );
+    if (responsen.statusCode == 200) {
+      final data = jsonDecode(responsen.body);
+      setState(() {
+        novaSlika = data['newpic'];
+      });
+    }
+          final responsew = await http.get(
+      Uri.parse('https://utilitymeter.uk/get-reading-status'),
+      headers: {'X-API-Key': 'zavrsnirad'},
+    );
+    if (responsew.statusCode == 200) {
+      final data = jsonDecode(responsew.body);
+      setState(() {
+        neobicnaPotrosnja = data['weirdReading'];
+      });
+    }
   }
 
 
   @override
   void initState() {
     super.initState();
-    getInterval();
+    getObavijesti();
   }
 
   @override
@@ -115,22 +147,9 @@ class PostavkePageState extends State<PostavkePage> {
                 ),
               ],
             ),
-            Row(
-              children: [
-                Text('Uređaj offline:   ', style: TextStyle(fontSize: 16)),
-                Switch(
-                  value: uredajOffline,
-                  onChanged: (bool value) {
-                    setState(() {
-                      uredajOffline = value;
-                    });
-                  },
-                ),
-              ],
-            ),
             ElevatedButton(onPressed: ()
             {
-              spremiInterval(interval);
+              spremiObavijesti(interval, novaSlika, neobicnaPotrosnja);
             }, 
             child: Text('Spremi postavke')),
           ],

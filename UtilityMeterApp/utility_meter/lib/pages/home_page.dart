@@ -31,7 +31,11 @@ Future<void> getFCMToken() async {
   setState(() {
     fcmToken = token;
   });
-  print('FCM Token: $token');
+  await http.post(
+    Uri.parse('https://utilitymeter.uk/save-token'),
+    headers: {'X-API-Key': 'zavrsnirad', 'Content-Type': 'application/json'},
+    body: jsonEncode({'token': token})
+  );
 
 }
 
@@ -516,6 +520,7 @@ Future<void> getFCMToken() async {
                   fetchLastReadingForVoda();
                   getType();
                   getLast7DaysForType();
+                  getFCMToken();
                 },
                 child: Text('Refresh'),
               ),
